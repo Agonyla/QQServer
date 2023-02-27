@@ -22,6 +22,11 @@ public class ManageClientThreads {
         return hm.get(userId);
     }
 
+    // 从集合中移除某个线程对象
+    public static void removeClientThread(String userId) {
+        hm.remove(userId);
+    }
+
     // 编写方法 返回在线用户列表
     // 在线用户列表显示形式
     // 100 200 至尊宝 紫霞仙子
