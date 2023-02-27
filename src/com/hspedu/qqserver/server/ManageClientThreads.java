@@ -21,4 +21,17 @@ public class ManageClientThreads {
     public static ServerConnectClientThread getClientThread(String userId) {
         return hm.get(userId);
     }
+
+    // 编写方法 返回在线用户列表
+    // 在线用户列表显示形式
+    // 100 200 至尊宝 紫霞仙子
+    public static String getOnlineUsers() {
+
+        String onlineUserList = "";
+
+        for (String s : hm.keySet()) {
+            onlineUserList += s + " ";
+        }
+        return onlineUserList;
+    }
 }

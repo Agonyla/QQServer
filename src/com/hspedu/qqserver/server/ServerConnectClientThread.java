@@ -1,8 +1,10 @@
 package com.hspedu.qqserver.server;
 
 import com.hspedu.qqcommon.Message;
+import com.hspedu.qqcommon.MessageType;
 
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
@@ -31,6 +33,32 @@ public class ServerConnectClientThread extends Thread {
             try {
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) ois.readObject();
+                // 根据message类型，后面做相应的处理
+                if (message.getMessageType().equals(MessageType.MESSAGE_GET_ONLINE_FRIEND)) {
+
+                    // 客户端要在线用户列表
+                    /*
+                    在线用户列表显示形式
+                    100 200 至尊宝 紫霞仙子
+                     */
+                    System.out.println(message.getSender() + " 要在线用户列表");
+                    String onlineUsers = ManageClientThreads.getOnlineUsers();
+
+                    // 返回message
+                    // 构建一个message对象，返回给客户端
+                    Message message2 = new Message();
+                    message2.setMessageType(MessageType.MESSAGE_RET_ONLINE_FRIEND);
+                    message2.setContent(onlineUsers);
+                    message2.setGetter(message.getSender());
+
+                    // 返回给客户端
+                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                    oos.writeObject(message2);
+                    
+                } else {
+                    System.out.println("其他类型的message暂时不处理");
+                }
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
