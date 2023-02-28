@@ -12,6 +12,10 @@ public class ManageClientThreads {
 
     private static HashMap<String, ServerConnectClientThread> hm = new HashMap<>();
 
+    public static HashMap<String, ServerConnectClientThread> getHm() {
+        return hm;
+    }
+
     // 添加线程对象到 hm 集合
     public static void addClientThread(String userId, ServerConnectClientThread serverConnectClientThread) {
         hm.put(userId, serverConnectClientThread);

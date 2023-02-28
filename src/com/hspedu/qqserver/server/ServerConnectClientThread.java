@@ -6,6 +6,8 @@ import com.hspedu.qqcommon.MessageType;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * @Author Agony
@@ -59,13 +61,26 @@ public class ServerConnectClientThread extends Thread {
                     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                     oos.writeObject(message2);
 
-                } else if (message.getMessageType().equals(MessageType.MESSAGE_COMM_MIS)) {
+                } else if (message.getMessageType().equals(MessageType.MESSAGE_COMM_MES)) {
 
                     // 根据message获取getterId，然后得到对应的线程
                     ServerConnectClientThread clientThread = ManageClientThreads.getClientThread(message.getGetter());
 
                     ObjectOutputStream oos = new ObjectOutputStream(clientThread.getSocket().getOutputStream());
                     oos.writeObject(message);
+
+                } else if (message.getMessageType().equals(MessageType.MESSAGE_TO_ALL_MES)) {
+
+                    HashMap<String, ServerConnectClientThread> hm = ManageClientThreads.getHm();
+
+                    Set<String> ids = hm.keySet();
+                    for (String id : ids) {
+                        if (!id.equals(message.getSender())) {
+                            ObjectOutputStream oos = new ObjectOutputStream(hm.get(id).getSocket().getOutputStream());
+                            oos.writeObject(message);
+                        }
+                    }
+
 
                 } else if (message.getMessageType().equals(MessageType.MESSAGE_CLIENT_EXIT)) {
 
