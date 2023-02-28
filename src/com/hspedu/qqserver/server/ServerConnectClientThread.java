@@ -24,6 +24,10 @@ public class ServerConnectClientThread extends Thread {
         this.userId = userId;
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
     // 可以发送和接受消息
     @Override
     public void run() {
@@ -54,6 +58,14 @@ public class ServerConnectClientThread extends Thread {
                     // 返回给客户端
                     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                     oos.writeObject(message2);
+
+                } else if (message.getMessageType().equals(MessageType.MESSAGE_COMM_MIS)) {
+
+                    // 根据message获取getterId，然后得到对应的线程
+                    ServerConnectClientThread clientThread = ManageClientThreads.getClientThread(message.getGetter());
+
+                    ObjectOutputStream oos = new ObjectOutputStream(clientThread.getSocket().getOutputStream());
+                    oos.writeObject(message);
 
                 } else if (message.getMessageType().equals(MessageType.MESSAGE_CLIENT_EXIT)) {
 
