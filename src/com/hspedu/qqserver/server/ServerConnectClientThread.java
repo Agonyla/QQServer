@@ -82,6 +82,10 @@ public class ServerConnectClientThread extends Thread {
                     }
 
 
+                } else if (message.getMessageType().equals(MessageType.MESSAGE_FILE_MES)) {
+
+                    ObjectOutputStream oos = new ObjectOutputStream(ManageClientThreads.getClientThread(message.getGetter()).getSocket().getOutputStream());
+                    oos.writeObject(message);
                 } else if (message.getMessageType().equals(MessageType.MESSAGE_CLIENT_EXIT)) {
 
                     System.out.println(message.getSender() + " 退出系统");
