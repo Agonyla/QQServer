@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,6 +26,10 @@ public class QQServer {
     // 可以使用 ConcurrentHashMap，可以处理并发的集合.没有线程安全问题
     // ConcurrentHashMap 处理的线程安全，即线程同步处理，在多线程情况下是安全的
     private static ConcurrentHashMap<String, User> validUsers = new ConcurrentHashMap<>();
+
+    // 发送离线消息
+    public static ConcurrentHashMap<String, ArrayList<Message>> offlineUsers = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Message> offlineMessage = new ConcurrentHashMap<>();
 
     // 在静态代码块初始化 validUsers
     static {
@@ -79,7 +84,6 @@ public class QQServer {
 
                 // 创建一个Message对象,准备回复客户端
                 Message message = new Message();
-
                 // 登录成功
                 // 验证用户
                 if (checkUser(user.getUserId(), user.getPasswd())) {
@@ -97,6 +101,23 @@ public class QQServer {
                     // 把线程对象放入到集合中管理
                     ManageClientThreads.addClientThread(user.getUserId(), scct);
 
+                    for (String s : offlineUsers.keySet()) {
+                        if (user.getUserId().equals(s)) {
+                            for (Message message1 : offlineUsers.get(s)) {
+                                ObjectOutputStream oos1 = new ObjectOutputStream(socket.getOutputStream());
+                                oos1.writeObject(message1);
+                            }
+                            offlineUsers.remove(s);
+                        }
+                    }
+
+                    for (String s : offlineMessage.keySet()) {
+                        if (user.getUserId().equals(s)) {
+                            ObjectOutputStream oos2 = new ObjectOutputStream(socket.getOutputStream());
+                            oos2.writeObject(offlineMessage.get(s));
+                            offlineMessage.remove(s);
+                        }
+                    }
 
                 } else {
                     System.out.println("用户id = " + user.getUserId() + "密码  = " + user.getPasswd() + " 验证失败");
